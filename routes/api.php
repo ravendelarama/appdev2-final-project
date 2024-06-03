@@ -27,7 +27,11 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/logout', [AuthController::class, 'logout']);
+
+Route::post('/refresh-token', [AuthController::class, 'refreshToken'])
+    ->middleware('auth:sanctum', 'ability:issue-access-token');
 
 
 Route::middleware('auth:sanctum', 'ability:basic-access')->group(function () {

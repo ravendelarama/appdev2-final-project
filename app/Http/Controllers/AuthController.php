@@ -16,14 +16,21 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (Auth::attempt($credentials)) {
-            $token = $request->user()->createToken(
+            $access_token = $request->user()->createToken(
                 'access_token',
                 ['basic-access'],
-                Carbon::now()->addMinutes(config('sanctum.expiration'))
+                Carbon::now()->addMinutes(config('sanctum.at_expiration'))
+            );
+
+            $refresh_token = $request->user()->createToken(
+                'access_token',
+                ['basic-access'],
+                Carbon::now()->addMinutes(config('sanctum.rt_expiration'))
             );
 
             return response()->json([
-                'access_token' => $token->plainTextToken
+                'access_token' => $access_token->plainTextToken,
+                'refresh_token' => $refresh_token->plainTextToken
             ]);
         }
 
@@ -34,12 +41,29 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        if ($request->header('refresh-token')) {
+            PersonalAccessToken::findToken($request->header('refresh-token'))->delete();
+        }
+
         if ($request->bearerToken()) {
             PersonalAccessToken::findToken($request->bearerToken())->delete();
         }
 
         return response()->json([
             'message' => 'Signed out.'
+        ]);
+    }
+
+    public function refreshToken(Request $request)
+    {
+        $token = $request->user()->createToken(
+            'refresh_token',
+            'issue-access-token',
+            Carbon::now()->addMinutes(config('sanctum.rt_expiration'))
+        );
+
+        return response()->json([
+            'access_token' => $token
         ]);
     }
 }
