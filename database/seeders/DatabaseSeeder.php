@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Attachment;
+use App\Models\Post;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,6 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        Post::factory()->create([
+            'parent_id' => Post::factory(),
+            'quote_id' => Post::factory()
+        ]);
+
         $this->call([
             UserSeeder::class,
             FollowSeeder::class,

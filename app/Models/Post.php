@@ -35,4 +35,24 @@ class Post extends Model
     {
         return $this->hasMany(Repost::class);
     }
+
+    public function replies()
+    {
+        return $this->hasMany(Post::class, 'parent_id');
+    }
+
+    public function parentPost()
+    {
+        return $this->belongsTo(Post::class, 'parent_id');
+    }
+
+    public function quotePosts()
+    {
+        return $this->hasMany(Post::class, 'quote_id');
+    }
+
+    public function quotedPost()
+    {
+        return $this->belongsTo(Post::class, 'quote_id');
+    }
 }

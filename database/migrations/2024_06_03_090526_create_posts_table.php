@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('posts')->cascadeOnDelete();
+            $table->unsignedBigInteger('quote_id')->nullable();
+            $table->foreign('quote_id')->references('id')->on('posts')->cascadeOnDelete();
             $table->unsignedBigInteger('view_count')->default(0);
             $table->string('caption')->nullable();
             $table->boolean('hide_like_and_share')->default(false);
