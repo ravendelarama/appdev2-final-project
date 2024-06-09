@@ -10,6 +10,7 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
+        'type',
         'user_id',
         'caption',
         'view_count',
@@ -36,23 +37,28 @@ class Post extends Model
         return $this->hasMany(Repost::class);
     }
 
+    public function views()
+    {
+        return $this->hasMany(View::class);
+    }
+
     public function replies()
     {
-        return $this->hasMany(Post::class, 'parent_id');
+        return $this->belongsToMany(Reply::class, 'replies', 'children_id', 'parent_id');
     }
 
-    public function parentPost()
+    public function parent()
     {
-        return $this->belongsTo(Post::class, 'parent_id');
+        return $this->belongsToMany(Reply::class, 'replies', 'parent_id', 'children_id');
     }
 
-    public function quotePosts()
+    public function quotes()
     {
-        return $this->hasMany(Post::class, 'quote_id');
+        return $this->belongsToMany(Quote::class, 'quotes', 'quote_id', 'reference_id');
     }
 
-    public function quotedPost()
+    public function quoteOrigin()
     {
-        return $this->belongsTo(Post::class, 'quote_id');
+        return $this->belongsToMany(Quote::class, 'quotes', 'reference_id', 'quote_id');
     }
 }

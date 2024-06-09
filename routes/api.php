@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RepostController;
@@ -26,22 +27,25 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
-Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/register', 'register');
+    Route::post('/login', 'login');
+    Route::post('/logout', 'logout');
+});
 
 Route::post('/refresh-token', [AuthController::class, 'refreshToken'])
     ->middleware('auth:sanctum', 'ability:issue-access-token');
 
 
 Route::middleware('auth:sanctum', 'ability:basic-access')->group(function () {
-    Route::apiResources([
-        'users' => UserController::class,
-        'posts' => PostController::class
-    ]);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('posts', PostController::class);
+    Route::get('saved-posts', [PostController::class, 'savedPosts']);
 
     Route::apiResource('attachments', AttachmentController::class)->except(['index', 'update']);
-    Route::apiResource('reposts', RepostController::class)->except(['index', 'update']);
-    Route::apiResource('saved-posts', SavedPostController::class)->except(['index', 'update']);
-    Route::apiResource('likes', LikeController::class)->except(['index', 'update']);
+    Route::apiResource('reposts', RepostController::class)->except(['index', 'update', 'show']);
+    Route::apiResource('saved-posts', SavedPostController::class)->except(['index', 'update', 'show']);
+    Route::apiResource('likes', LikeController::class)->except(['index', 'update', 'show']);
+    Route::apiResource('follows', FollowController::class)->except(['index', 'update', 'show']);
 });

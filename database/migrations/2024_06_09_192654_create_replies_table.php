@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('replies', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->foreignId('user_id')->cascadeOnDelete()->constrained();
-            $table->string('caption')->nullable();
-            $table->boolean('hide_like_and_share')->default(false);
+            $table->foreignId('parent_id')->references('id')->on('posts')->cascadeOnDelete()->constrained();
+            $table->foreignId('children_id')->references('id')->on('posts')->cascadeOnDelete()->constrained();
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('replies');
     }
 };

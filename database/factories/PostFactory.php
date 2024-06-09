@@ -20,8 +20,8 @@ class PostFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'type' => 'post',
             'caption' => fake()->sentence(),
-            'view_count' => random_int(0, 999999999999)
         ];
     }
 }

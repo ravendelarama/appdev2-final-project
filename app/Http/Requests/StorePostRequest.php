@@ -11,7 +11,7 @@ class StorePostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,6 +21,12 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [];
+        return [
+            "type" => "required",
+            "parent_id" => "nullable",
+            "quote_id" => "nullable",
+            "caption" => "nullable|min:1|max:255",
+            "hide_like_and_share" => "nullable|boolean"
+        ];
     }
 }

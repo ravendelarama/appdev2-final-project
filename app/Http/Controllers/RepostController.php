@@ -10,17 +10,17 @@ class RepostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store()
     {
-        //
-    }
+        $newRepost = Repost::create([
+            "user_id" => request()->user()->id,
+            "post_id" => request()->input("post_id")
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Repost $repost)
-    {
-        //
+        return response()->json([
+            "message" => "Post has been reposted.",
+            "post" => $newRepost
+        ], 201);
     }
 
     /**
@@ -28,6 +28,16 @@ class RepostController extends Controller
      */
     public function destroy(Repost $repost)
     {
-        //
+        if (request()->user()->id == $repost->user_id) {
+            $repost->delete();
+
+            return response()->json([
+                "message" => "successful."
+            ]);
+        }
+
+        return response()->json([
+            "message" => "Unauthorized."
+        ], 401);
     }
 }

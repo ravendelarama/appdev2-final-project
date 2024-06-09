@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
@@ -23,7 +25,7 @@ class AuthController extends Controller
             );
 
             $refresh_token = $request->user()->createToken(
-                'access_token',
+                'refresh_token',
                 ['basic-access'],
                 Carbon::now()->addMinutes(config('sanctum.rt_expiration'))
             );
@@ -51,6 +53,41 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Signed out.'
+        ]);
+    }
+
+    public function register(StoreUserRequest $request)
+    {
+        $credentials = $request->validated();
+
+        User::create([
+            "name" => $credentials["name"],
+            "username" => $credentials["username"],
+            "email" => $credentials["email"],
+            "password" => Hash::make($credentials["password"]),
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $access_token = $request->user()->createToken(
+                'access_token',
+                ['basic-access'],
+                Carbon::now()->addMinutes(config('sanctum.at_expiration'))
+            );
+
+            $refresh_token = $request->user()->createToken(
+                'refresh_token',
+                ['basic-access'],
+                Carbon::now()->addMinutes(config('sanctum.rt_expiration'))
+            );
+
+            return response()->json([
+                'access_token' => $access_token->plainTextToken,
+                'refresh_token' => $refresh_token->plainTextToken
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Server error.'
         ]);
     }
 

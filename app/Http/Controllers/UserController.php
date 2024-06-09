@@ -45,7 +45,19 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $fields = $request->validated();
+
+        if (request()->user()->id == $user->id) {
+            User::where('id', $user->id)->update($fields);
+
+            return response()->json([
+                "message" => "Updated.",
+            ]);
+        }
+
+        return response()->json([
+            "message" => "Unauthorized."
+        ], 401);
     }
 
     /**

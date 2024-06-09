@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use function PHPSTORM_META\map;
+
 class UpdateUserRequest extends FormRequest
 {
     /**
@@ -11,7 +13,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,12 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "bio" => "nullable|min:1|max:255",
+            "image" => "nullable",
+            "email" => "nullable|email|unique:users,email",
+            "private" => "nullable|boolean",
+            "username" => "nullable|min:4|max:20|unique:users,username",
+            "name" => "nullable|min:2|max:30"
         ];
     }
 }
